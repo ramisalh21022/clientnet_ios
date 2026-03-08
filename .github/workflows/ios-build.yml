@@ -19,22 +19,26 @@ jobs:
           git clone https://github.com/flutter/flutter.git -b stable --depth 1
           echo "$PWD/flutter/bin" >> $GITHUB_PATH
 
-      # 2️⃣ تحقق من نسخة Flutter و Dart
+      # 2️⃣ تحقق من نسخة Flutter
       - run: flutter --version
 
-      # 3️⃣ Get dependencies
+      # 3️⃣ تنزيل ملفات iOS اللازمة
+      - name: Flutter precache iOS
+        run: flutter precache --ios
+
+      # 4️⃣ تثبيت dependencies
       - run: flutter pub get
 
-      # 4️⃣ تثبيت CocoaPods
+      # 5️⃣ تثبيت CocoaPods
       - run: |
           cd ios
           pod install --repo-update
           cd ..
 
-      # 5️⃣ Build iOS بدون code signing
+      # 6️⃣ Build iOS بدون توقيع
       - run: flutter build ios --release --no-codesign
 
-      # 6️⃣ رفع الـ artifact
+      # 7️⃣ رفع artifact
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
