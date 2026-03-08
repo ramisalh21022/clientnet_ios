@@ -37,7 +37,7 @@ jobs:
 
       # 6️⃣ Build إعدادات iOS فقط (تجنب Code Signing)
       - name: Prepare iOS build (config-only)
-        run: flutter build ios --release --no-codesign --config-only
+        run: flutter build ios --simulator
 
       # 7️⃣ Build باستخدام xcodebuild بدون توقيع
       - name: Build Runner.app without code signing
