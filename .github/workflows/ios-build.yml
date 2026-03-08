@@ -1,36 +1,39 @@
-name: Build Flutter iOS (No Signing)
+name: Flutter iOS Build (No Signing)
 
 on:
-  push:
-    branches: [ main ]
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   build-ios:
     runs-on: macos-latest
 
     steps:
-      # 1️⃣ سحب الكود من GitHub
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      # 2️⃣ تثبيت Flutter
-      - name: Install Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.16.0'  # يجب أن يكون >= Dart 3.9.2
+      # 1️⃣ تثبيت Flutter
+      - name: Install Flutter manually
+        run: |
+          git clone https://github.com/flutter/flutter.git -b stable --depth 1
+          echo "$PWD/flutter/bin" >> $GITHUB_PATH
 
-      # 3️⃣ تحقق من Flutter & Dart
-      - name: Flutter version
-        run: flutter --version
+      # 2️⃣ تحقق من نسخة Flutter
+      - run: flutter --version
 
-      # 4️⃣ تنزيل الـ iOS artifacts الضرورية
+      # 3️⃣ تنزيل ملفات iOS اللازمة
       - name: Flutter precache iOS
         run: flutter precache --ios
 
-      # 5️⃣ تثبيت dependencies
-      - name: Flutter pub get
-        run: flutter pub get
+      # 4️⃣ تثبيت dependencies
+      - run: flutter pub get
+
+      # 5️⃣ تثبيت CocoaPods
+      - run: |
+          cd ios
+          pod install --repo-update
+          cd ..
 
       # 6️⃣ Build إعدادات iOS فقط (تجنب Code Signing)
       - name: Prepare iOS build (config-only)
