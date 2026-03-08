@@ -11,21 +11,17 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      # 1️⃣ سحب الكود من GitHub
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2️⃣ إعداد Flutter
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: 'stable'
 
-      # 3️⃣ تثبيت Dependencies
       - name: Install Flutter packages
         run: flutter pub get
 
-      # 4️⃣ تثبيت CocoaPods
       - name: Install CocoaPods
         run: |
           sudo gem install cocoapods
@@ -33,19 +29,16 @@ jobs:
           pod install
           cd ..
 
-      # 5️⃣ بناء التطبيق بدون توقيع
       - name: Build iOS release
         run: flutter build ios --release --no-codesign
 
-      # 6️⃣ أرشفة التطبيق
       - name: Archive IPA
         run: |
           mkdir -p output
           cp -R build/ios/iphoneos/Runner.app output/
 
-      # 7️⃣ رفع Artifact ليتم تحميله من GitHub
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ios-app
           path: output/
