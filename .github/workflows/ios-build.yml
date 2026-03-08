@@ -1,4 +1,4 @@
-name: Build Flutter iOS App
+name: Build iOS App for Windows Users
 
 on:
   push:
@@ -11,17 +11,21 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - name: Checkout repository
+      # 1️⃣ سحب الكود
+      - name: Checkout repo
         uses: actions/checkout@v3
 
+      # 2️⃣ تثبيت Flutter
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: 'stable'
 
-      - name: Install Flutter packages
+      # 3️⃣ تثبيت Dependencies
+      - name: Get Flutter packages
         run: flutter pub get
 
+      # 4️⃣ تثبيت CocoaPods
       - name: Install CocoaPods
         run: |
           sudo gem install cocoapods
@@ -29,15 +33,18 @@ jobs:
           pod install
           cd ..
 
-      - name: Build iOS release
+      # 5️⃣ بناء التطبيق بدون توقيع
+      - name: Build iOS (no code signing)
         run: flutter build ios --release --no-codesign
 
-      - name: Archive IPA
+      # 6️⃣ إنشاء مجلد Output وتجميع التطبيق
+      - name: Archive Runner.app
         run: |
           mkdir -p output
           cp -R build/ios/iphoneos/Runner.app output/
 
-      - name: Upload artifact
+      # 7️⃣ رفع Artifact ليتم تحميله
+      - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ios-app
