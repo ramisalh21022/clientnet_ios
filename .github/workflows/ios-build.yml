@@ -11,35 +11,38 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      # 1️⃣ Checkout repo
+      - uses: actions/checkout@v4
 
-      - name: Setup Flutter (>=3.16.9)
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: "3.16.9"
-          channel: stable
+      # 2️⃣ Install Flutter manually (Dart 3.9+)
+      - name: Install Flutter manually
+        run: |
+          git clone https://github.com/flutter/flutter.git -b stable --depth 1
+          export PATH="$PWD/flutter/bin:$PATH"
+          flutter --version
 
-      - name: Flutter version
-        run: flutter --version
-
+      # 3️⃣ Get dependencies
       - name: Flutter pub get
         run: flutter pub get
 
+      # 4️⃣ Install CocoaPods
       - name: Install CocoaPods
         run: |
           cd ios
           pod install --repo-update
           cd ..
 
-      - name: Build iOS (no code signing)
+      # 5️⃣ Build iOS without code signing
+      - name: Build iOS
         run: flutter build ios --release --no-codesign
 
+      # 6️⃣ Prepare artifact
       - name: Prepare artifact
         run: |
           mkdir output
           cp -R build/ios/iphoneos/Runner.app output/
 
+      # 7️⃣ Upload artifact
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
