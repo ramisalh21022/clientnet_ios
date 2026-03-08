@@ -14,7 +14,7 @@ jobs:
       # 1️⃣ سحب المشروع
       - uses: actions/checkout@v4
 
-      # 2️⃣ تثبيت Flutter (Dart ≥3.9.2)
+      # 2️⃣ تثبيت Flutter (دعم Dart >=3.9.2)
       - name: Install Flutter manually
         run: |
           git clone https://github.com/flutter/flutter.git -b stable --depth 1
@@ -23,7 +23,7 @@ jobs:
       # 3️⃣ تحقق من Flutter & Dart
       - run: flutter --version
 
-      # 4️⃣ تنزيل ملفات iOS اللازمة
+      # 4️⃣ تنزيل ملفات iOS الضرورية
       - name: Flutter precache iOS
         run: flutter precache --ios
 
@@ -31,13 +31,15 @@ jobs:
       - run: flutter pub get
 
       # 6️⃣ تثبيت CocoaPods
-      - run: |
+      - name: Install CocoaPods
+        run: |
           cd ios
           pod install --repo-update
           cd ..
 
-      # 7️⃣ Build iOS بدون Code Signing
-      - run: flutter build ios --release --no-codesign
+      # 7️⃣ Build iOS بدون Code Signing (device) - التحذير طبيعي
+      - name: Build iOS
+        run: flutter build ios --release --no-codesign
 
       # 8️⃣ تجهيز Artifact
       - name: Prepare artifact
