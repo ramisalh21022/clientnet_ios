@@ -14,24 +14,25 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Flutter
+      - name: Setup Flutter (>=3.16.9)
         uses: subosito/flutter-action@v2
         with:
           flutter-version: "3.16.9"
           channel: stable
 
-      - run: flutter --version
+      - name: Flutter version
+        run: flutter --version
 
       - name: Flutter pub get
         run: flutter pub get
 
-      - name: Install pods
+      - name: Install CocoaPods
         run: |
           cd ios
           pod install --repo-update
           cd ..
 
-      - name: Build iOS
+      - name: Build iOS (no code signing)
         run: flutter build ios --release --no-codesign
 
       - name: Prepare artifact
