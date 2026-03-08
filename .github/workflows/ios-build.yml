@@ -1,51 +1,54 @@
-name: Build iOS App for Windows Users
+name: Flutter iOS Build (No Signing)
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
   build-ios:
     runs-on: macos-latest
 
     steps:
-      # 1️⃣ سحب الكود
-      - name: Checkout repo
-        uses: actions/checkout@v3
+      # 1️⃣ سحب المشروع
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      # 2️⃣ تثبيت Flutter
+      # 2️⃣ تثبيت Flutter (حل مشكلة stable)
       - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+        uses: subosito/flutter-action@v3
         with:
-          flutter-version: 'stable'
+          flutter-version: "3.16.9"
+          channel: stable
 
-      # 3️⃣ تثبيت Dependencies
-      - name: Get Flutter packages
+      # 3️⃣ عرض معلومات Flutter
+      - run: flutter --version
+
+      # 4️⃣ تحميل dependencies
+      - name: Flutter pub get
         run: flutter pub get
 
-      # 4️⃣ تثبيت CocoaPods
-      - name: Install CocoaPods
+      # 5️⃣ تثبيت CocoaPods
+      - name: Install pods
         run: |
-          sudo gem install cocoapods
           cd ios
-          pod install
+          pod install --repo-update
           cd ..
 
-      # 5️⃣ بناء التطبيق بدون توقيع
-      - name: Build iOS (no code signing)
+      # 6️⃣ بناء iOS بدون توقيع
+      - name: Build iOS
         run: flutter build ios --release --no-codesign
 
-      # 6️⃣ إنشاء مجلد Output وتجميع التطبيق
-      - name: Archive Runner.app
+      # 7️⃣ تجهيز المخرجات
+      - name: Prepare artifact
         run: |
-          mkdir -p output
+          mkdir output
           cp -R build/ios/iphoneos/Runner.app output/
 
-      # 7️⃣ رفع Artifact ليتم تحميله
-      - name: Upload IPA Artifact
+      # 8️⃣ رفع الملف
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ios-app
+          name: ios-build
           path: output/
