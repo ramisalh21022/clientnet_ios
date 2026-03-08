@@ -11,36 +11,43 @@ jobs:
     runs-on: macos-latest
 
     steps:
+      # 1️⃣ سحب المشروع
       - uses: actions/checkout@v4
 
-      # 1️⃣ تثبيت Flutter
+      # 2️⃣ تثبيت Flutter (Dart ≥3.9.2)
       - name: Install Flutter manually
         run: |
           git clone https://github.com/flutter/flutter.git -b stable --depth 1
           echo "$PWD/flutter/bin" >> $GITHUB_PATH
 
-      # 2️⃣ تحقق من نسخة Flutter
+      # 3️⃣ تحقق من Flutter & Dart
       - run: flutter --version
 
-      # 3️⃣ تنزيل ملفات iOS اللازمة
+      # 4️⃣ تنزيل ملفات iOS اللازمة
       - name: Flutter precache iOS
         run: flutter precache --ios
 
-      # 4️⃣ تثبيت dependencies
+      # 5️⃣ تثبيت dependencies
       - run: flutter pub get
 
-      # 5️⃣ تثبيت CocoaPods
+      # 6️⃣ تثبيت CocoaPods
       - run: |
           cd ios
           pod install --repo-update
           cd ..
 
-      # 6️⃣ Build iOS بدون توقيع
+      # 7️⃣ Build iOS بدون Code Signing
       - run: flutter build ios --release --no-codesign
 
-      # 7️⃣ رفع artifact
+      # 8️⃣ تجهيز Artifact
+      - name: Prepare artifact
+        run: |
+          mkdir output
+          cp -R build/ios/iphoneos/Runner.app output/
+
+      # 9️⃣ رفع Artifact
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ios-build
-          path: build/ios/iphoneos/Runner.app
+          path: output/
