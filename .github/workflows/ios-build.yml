@@ -11,42 +11,34 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      # 1️⃣ سحب المشروع
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ تثبيت Flutter (حل مشكلة stable)
       - name: Setup Flutter
-        uses: subosito/flutter-action@v3
+        uses: subosito/flutter-action@v2
         with:
           flutter-version: "3.16.9"
           channel: stable
 
-      # 3️⃣ عرض معلومات Flutter
       - run: flutter --version
 
-      # 4️⃣ تحميل dependencies
       - name: Flutter pub get
         run: flutter pub get
 
-      # 5️⃣ تثبيت CocoaPods
       - name: Install pods
         run: |
           cd ios
           pod install --repo-update
           cd ..
 
-      # 6️⃣ بناء iOS بدون توقيع
       - name: Build iOS
         run: flutter build ios --release --no-codesign
 
-      # 7️⃣ تجهيز المخرجات
       - name: Prepare artifact
         run: |
           mkdir output
           cp -R build/ios/iphoneos/Runner.app output/
 
-      # 8️⃣ رفع الملف
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
